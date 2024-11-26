@@ -25,11 +25,12 @@ def get_filters():
             city = ''
             print('Uh oh! That\'s not a valid city. Try again.')
 
-    # Get user input for month (all, january, february, ... , june)
+    # Get user input for month (all, january, february, ... , december)
     month = ''
-    months = ['all', 'january', 'february', 'march', 'april', 'may', 'june']
+    months = ['all', 'january', 'february', 'march', 'april', 'may', 'june',
+              'july', 'august', 'september', 'october', 'november', 'december']
     while len(month) == 0:
-        month = input('Please choose a month (January-June or all)').lower()
+        month = input('Please choose a month or all').lower()
         if month not in months:
             month = ''
             print('Uh oh! That\'s not a valid month. Please type it out fully.')
@@ -66,7 +67,8 @@ def load_data(city, month, day):
     df['day_of_week'] = df['Start Time'].dt.weekday_name
     
     if month != 'all':
-        months = ['january', 'february', 'march', 'april', 'may', 'june']
+        months = ['january', 'february', 'march', 'april', 'may', 'june'
+                  'july', 'august', 'september', 'october', 'november', 'december']
         month = months.index(month) + 1
         df = df[df['month'] == month]
     
