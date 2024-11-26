@@ -25,26 +25,31 @@ def get_filters():
             city = ''
             print('Uh oh! That\'s not a valid city. Try again.')
 
-    # Get user input for month (all, january, february, ... , december)
+    # Check for direct raw data request.
     month = ''
-    months = ['all', 'january', 'february', 'march', 'april', 'may', 'june',
-              'july', 'august', 'september', 'october', 'november', 'december']
-    while len(month) == 0:
-        month = input('Please choose a month or all').lower()
-        if month not in months:
-            month = ''
-            print('Uh oh! That\'s not a valid month. Please type it out fully.')
-
-    # Get user input for day of week (all, monday, tuesday, ... sunday)
     day = ''
-    days = ['all', 'sunday', 'monday', 'tuesday',
-            'wednesday', 'thursday', 'friday',
-            'saturday, sunday']
-    while len(day) == 0:
-        day = input('Please choose a day of the week, or all.').lower()
-        if day not in days:
-            day = ''
-            print('Uh oh! That\'s not a valid day of the week. Please type it out fully.')
+    raw_skip = input('Would you like to see the raw data directly? Enter yes or no.').lower()
+    while raw_skip not in ('yes', 'no'):            
+        raw_skip = input('Sorry, that wasn\'t a valid input. Enter yes or no.').lower()
+    if raw_skip == 'no':
+        # Get user input for month (all, january, february, ... , december)
+        months = ['all', 'january', 'february', 'march', 'april', 'may', 'june',
+                  'july', 'august', 'september', 'october', 'november', 'december']
+        while len(month) == 0:
+            month = input('Please choose a month or all').lower()
+            if month not in months:
+                month = ''
+                print('Uh oh! That\'s not a valid month. Please type it out fully.')
+
+        # Get user input for day of week (all, monday, tuesday, ... sunday)
+        days = ['all', 'sunday', 'monday', 'tuesday',
+                'wednesday', 'thursday', 'friday',
+                'saturday, sunday']
+        while len(day) == 0:
+            day = input('Please choose a day of the week, or all.').lower()
+            if day not in days:
+                day = ''
+                print('Uh oh! That\'s not a valid day of the week. Please type it out fully.')
 
     print('-'*40)
     return city, month, day
@@ -178,13 +183,19 @@ def user_stats(df):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
-def raw_data(city):
+def raw_data(city, month):
     """Displays raw data until user asks to stop."""
 
     raw_df = pd.read_csv(CITY_DATA[city])
-    proceed = input('Would you like to see the raw data? Enter yes or no.').lower()
-    while proceed not in ('yes', 'no'):            
-            proceed = input('Sorry, that wasn\'t a valid input. Enter yes or no.').lower()
+
+    # If the user skipped to this point, don't ask the same question twice.
+    proceed = ''
+    if len(month) == 0:
+        proceed = 'yes'
+    else:
+        proceed = input('Would you like to see the raw data? Enter yes or no.').lower()
+        while proceed not in ('yes', 'no'):            
+                proceed = input('Sorry, that wasn\'t a valid input. Enter yes or no.').lower()
 
     index = 0
     max_col = raw_df.size / len(raw_df.columns)
@@ -200,13 +211,14 @@ def raw_data(city):
 def main():
     while True:
         city, month, day = get_filters()
-        df = load_data(city, month, day)
+        if len(month) > 0:
+            df = load_data(city, month, day)
+            time_stats(df)
+            station_stats(df)
+            trip_duration_stats(df)
+            user_stats(df)
 
-        time_stats(df)
-        station_stats(df)
-        trip_duration_stats(df)
-        user_stats(df)
-        raw_data(city)
+        raw_data(city, month)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n').lower()
         while restart not in ('yes', 'no'):            
