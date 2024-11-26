@@ -1,5 +1,6 @@
 ### Project History
-Project created November 21st, 2024\n
+Project created November 21st, 2024
+
 Readme created November 26th, 2024
 
 ### Bikeshare Data Analyzer
