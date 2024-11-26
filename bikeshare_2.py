@@ -183,16 +183,13 @@ def user_stats(df):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
-def raw_data(city, month):
+def raw_data(city, proceed):
     """Displays raw data until user asks to stop."""
 
     raw_df = pd.read_csv(CITY_DATA[city])
 
-    # If the user skipped to this point, don't ask the same question twice.
-    proceed = ''
-    if len(month) == 0:
-        proceed = 'yes'
-    else:
+    # Depending on previous input or output, this question may not be necessary.
+    if len(proceed) == 0:
         proceed = input('Would you like to see the raw data? Enter yes or no.').lower()
         while proceed not in ('yes', 'no'):            
                 proceed = input('Sorry, that wasn\'t a valid input. Enter yes or no.').lower()
@@ -211,14 +208,22 @@ def raw_data(city, month):
 def main():
     while True:
         city, month, day = get_filters()
+        goto_raw = ''
         if len(month) > 0:
             df = load_data(city, month, day)
-            time_stats(df)
-            station_stats(df)
-            trip_duration_stats(df)
-            user_stats(df)
+            if df.size > 0:
+                time_stats(df)
+                station_stats(df)
+                trip_duration_stats(df)
+                user_stats(df)
+            else:
+                print("No data available given your search criteria.")
+                print('-'*40)
+                goto_raw = 'no'
+        else:
+            goto_raw = 'yes'
 
-        raw_data(city, month)
+        raw_data(city, goto_raw)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n').lower()
         while restart not in ('yes', 'no'):            
